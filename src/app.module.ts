@@ -5,7 +5,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BooksModule } from './books/books.module';
-import { HandleRequestInterceptor } from './interceptors/handle-request.interceptor';
+import { HandleRequestInterceptor } from './core/handle-request.interceptor';
 
 @Module({
   imports: [
