@@ -1,34 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import {BookDto} from './dto/book.dto';
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { Book, BookDocument } from "./models/book.schema";
+import { CreateUpdateBookDto } from "./dto/create-update-book.dto";
 
 @Injectable()
 export class BooksService {
 
-    private books: BookDto[] = [];
+    constructor(
+        @InjectModel(Book.name) private bookModel: Model<BookDocument>
+    ) {}
 
-    constructor() {
-        this.books = [{
-            id: '1',
-            title: 'Мастер и Маргарита',
-            description: 'Роман Михаила Афанасьевича Булгакова, работа над которым началась в декабре 1928 года и продолжалась вплоть до смерти писателя. Роман относится к незавершённым произведениям; редактирование и сведение воедино черновых записей осуществляла после смерти мужа вдова писателя - Елена Сергеевна. Первая версия романа, имевшая названия «Копыто инженера», «Чёрный маг» и другие, была уничтожена Булгаковым в 1930 году. В последующих редакциях среди героев произведения появились автор романа о Понтии Пилате и его возлюбленная.',
-            authors: 'Михаил Афанасьевич Булгаков',
-            fileCover: '/books-covers/d69d2f8a2eefe7daf2e8f77965c0f350.jpg'
-        },{
-            id: '2',
-            'title': '451 градус по Фаренгейту',
-            'description': 'Научно-фантастический роман-антиутопия Рэя Брэдбери, изданный в 1953 году. Роман описывает американское общество близкого будущего, в котором книги находятся под запретом; «пожарные», к числу которых принадлежит и главный герой Гай Монтэг, сжигают любые найденные книги. В ходе романа Монтэг разочаровывается в идеалах общества, частью которого он является, становится изгоем и присоединяется к небольшой подпольной группе маргиналов, сторонники которой заучивают тексты книг, чтобы спасти их для потомков. Название книги объясняется в эпиграфе: «451 градус по Фаренгейту - температура, при которой воспламеняется и горит бумага»',
-            'authors': 'Рэй Брэдбери',
-            'fileCover': '/books-covers/25c2ef0839087cf6bff4c32fed22505d.webp'
-        },{
-            id: '3',
-            title: 'Цветы для Элджернона',
-            description: 'Научно-фантастический рассказ Дэниела Киза. Первоначально издан в апрельском номере «Журнала фэнтези и научной фантастики» за 1959 год. Премия «Хьюго» за лучший короткий научно-фантастический рассказ.',
-            authors: 'Дэниел Киз',
-            fileCover: '/books-covers/l4ajqgq4vc1u42sp62v3r75lv7alhhbj.webp'
-        }];
+    getAll(): Promise<Book[]> {
+        return this.bookModel.find().select('-__v');
     }
 
-    async getAll(): Promise<BookDto[]> {
-        return this.books;
+    getById(bookId): Promise<Book> {
+        return this.bookModel.findById(bookId).select('-__v');
+    }
+
+    async create(bookDto: CreateUpdateBookDto): Promise<Book> {
+        const book = new this.bookModel(bookDto);
+        return book.save();
+    }
+
+    async update(bookId: string, bookDto: CreateUpdateBookDto): Promise<Book> {
+        await this.bookModel.findByIdAndUpdate(bookId, bookDto);
+        return this.getById(bookId);
+    }
+
+    async remove(bookId: string): Promise<void> {
+        await this.bookModel.findByIdAndDelete(bookId);
     }
 }
