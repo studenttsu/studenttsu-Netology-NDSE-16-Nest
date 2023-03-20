@@ -6,11 +6,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BooksModule } from './books/books.module';
 import { HandleRequestInterceptor } from './core/handle-request.interceptor';
+import { BookCommentsModule } from './book-comments/book-comments.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost:27017/db'),
     BooksModule,
+    BookCommentsModule,
   ],
   controllers: [AppController],
   providers: [
