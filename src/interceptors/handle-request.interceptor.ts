@@ -21,7 +21,7 @@ export class HandleRequestInterceptor implements NestInterceptor {
             new HttpException(
               {
                 status: 'fail',
-                data: e?.response ? e.response : e,
+                data: e,
               },
               500,
             ),
