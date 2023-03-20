@@ -6,25 +6,23 @@ import {
   Param,
   Post,
   Put,
-  UseInterceptors,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateUpdateBookDto } from './dto/create-update-book.dto';
 import { Book } from './models/book.schema';
-import { HandleRequestInterceptor } from '../interceptors/handle-request.interceptor';
+import { IdValidationPipe } from './book-id-validation-pipe.service';
 
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
   @Get()
-  @UseInterceptors(HandleRequestInterceptor)
   getBooks(): Promise<Book[]> {
     return this.booksService.getAll();
   }
 
   @Get(':id')
-  getBook(@Param('id') id: string): Promise<Book> {
+  getBook(@Param('id', IdValidationPipe) id: string): Promise<Book> {
     return this.booksService.getById(id);
   }
 
@@ -35,14 +33,14 @@ export class BooksController {
 
   @Put(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', IdValidationPipe) id: string,
     @Body() bookDto: CreateUpdateBookDto,
   ): Promise<Book> {
     return this.booksService.update(id, bookDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
+  remove(@Param('id', IdValidationPipe) id: string): Promise<void> {
     return this.booksService.remove(id);
   }
 }

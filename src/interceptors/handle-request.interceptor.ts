@@ -1,6 +1,7 @@
 import {
   CallHandler,
   ExecutionContext,
+  HttpException,
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
@@ -15,10 +16,16 @@ export class HandleRequestInterceptor implements NestInterceptor {
         data: value,
       })),
       catchError((e) =>
-        throwError(() => ({
-          status: 'fail',
-          data: e,
-        })),
+        throwError(
+          () =>
+            new HttpException(
+              {
+                status: 'fail',
+                data: e?.response ? e.response : e,
+              },
+              500,
+            ),
+        ),
       ),
     );
   }
